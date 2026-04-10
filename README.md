@@ -116,7 +116,7 @@ Adds timing. On each button press, `millis()` records the start time. On release
 
 ### `firmware/dev/Dispenser_button_test3`
 
-Adds volume calculations using the flow rate constants provided by Multiplex Beverage:
+Adds volume calculations using the flow rate constants provided.
 - Syrup: 0.5 oz/sec (0.0005 oz/ms)
 - Water: 2.5 oz/sec (0.0025 oz/ms)
 - Total drink: 3.0 oz/sec (0.0030 oz/ms)
@@ -260,7 +260,7 @@ Target board: **Heltec WiFi LoRa 32 V3**
 - [x] Pi 5 InfluxDB writer working (LoRaReceiver_InfluxSender_Updated.py)
 - [ ] Grafana dashboard panels configured
 - [ ] Booster Node firmware (ACS723 current sensing)
-- [ ] End-to-end integration test with Multiplex Beverage hardware
+- [ ] End-to-end integration test with the hardware
 
 ---
 
