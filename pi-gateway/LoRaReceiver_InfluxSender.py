@@ -1,15 +1,24 @@
 #!/usr/bin/env python3
 """
-LoRaReceiver_InfluxSender.py  (v1 - single measurement)
-Receives LoRa packets and writes all data to a single InfluxDB measurement: chiller_table.
-Routes all node types (C/B/D prefix) to the same measurement.
-See LoRaReceiver_InfluxSender_Updated.py for per-node routing.
+LoRaReceiver_InfluxSender.py  (v1 - per-node routing, raw string storage)
+Receives LoRa packets from all three nodes and routes them to separate
+InfluxDB measurements based on the node prefix character.
+
+Routing:
+  C: -> chiller_table
+  B: -> booster_table
+  D: -> dispenser_table
+
+Payload is stored as a raw string 'value' field.
+See LoRaReceiver_InfluxSender_Updated.py for native field parsing.
 
 InfluxDB: InfluxDB Cloud (AWS us-east-1)
 Org: Shepherds | Bucket: Multiplex_Sensor_Data
 
-Note: The API token is embedded. Rotate it if this repo is made public.
+IMPORTANT: Set your InfluxDB token in the environment variable INFLUX_TOKEN
+before running. Do not hardcode credentials in this file.
 """
+import os
 import time
 import spidev
 import lgpio
@@ -31,7 +40,7 @@ PREAMBLE = 8
 BW_MAP = {125.0: 0x04, 250.0: 0x05, 500.0: 0x06}
 
 INFLUX_URL    = "https://us-east-1-1.aws.cloud2.influxdata.com/api/v2/write"
-INFLUX_TOKEN  = "SnMPxzwZ88KTo0nPtix7jdfgwGzVS5_t_fj-BMqj69rScCR0auWH4_C35-fdhT0zQCyr8ao1o2oR7zG-vB3WGA=="
+INFLUX_TOKEN  = os.environ.get("INFLUX_TOKEN", "***INFLUX_TOKEN_NOT_SET***")
 INFLUX_ORG    = "Shepherds"
 INFLUX_BUCKET = "Multiplex_Sensor_Data"
 
@@ -110,7 +119,6 @@ class SX1262:
                         raw = self._cmd([0x1E, offset], read=plen+1)
                         msg = bytes(raw[1:plen+1]).decode('utf-8', errors='ignore').strip('\x00')
                         print(f"RX: {msg}")
-                        # Route by node prefix, strip prefix before writing
                         if msg.startswith('C'):
                             self.write_influx("chiller_table", {"device": "SX1262"}, {"value": f'"{msg[2:]}"'})
                         elif msg.startswith('B'):

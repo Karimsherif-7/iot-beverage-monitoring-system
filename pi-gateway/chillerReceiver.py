@@ -1,9 +1,15 @@
 #!/usr/bin/env python3
 """
 chillerReceiver.py
-Pi 5 LoRa receiver using SX1262 radio (direct SPI via lgpio).
-Prints received packets to stdout. No InfluxDB integration.
-Used for: Chiller Node and Dispenser Node reception testing.
+Bare-bones Pi 5 LoRa receiver using the SX1262 radio over direct SPI (lgpio).
+Prints all received packets to stdout. No InfluxDB integration.
+
+Use this script to verify the radio link is working before enabling
+data logging. This was the first script used on the Pi side after
+pingpong testing between two LoRa32 boards was confirmed working.
+
+Radio config: 915 MHz, BW=125 kHz, SF=7, CR=5
+Pins: CS=21, BUSY=24, RST=22, DIO1=16, TXEN=6
 """
 import time
 import spidev

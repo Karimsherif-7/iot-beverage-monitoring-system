@@ -6,11 +6,18 @@ Useful for clearing test data during development.
 
 WARNING: Deletes ALL data in the specified measurement across all time.
 Edit the 'predicate' field to target a different measurement before running.
+
+IMPORTANT: Set your InfluxDB token in the environment variable INFLUX_TOKEN
+before running.
+
+  export INFLUX_TOKEN="your_token_here"
+  python3 delete_measurement.py
 """
+import os
 import requests
 
 INFLUX_DELETE_URL = "https://us-east-1-1.aws.cloud2.influxdata.com/api/v2/delete"
-INFLUX_TOKEN      = "SnMPxzwZ88KTo0nPtix7jdfgwGzVS5_t_fj-BMqj69rScCR0auWH4_C35-fdhT0zQCyr8ao1o2oR7zG-vB3WGA=="
+INFLUX_TOKEN      = os.environ.get("INFLUX_TOKEN", "***INFLUX_TOKEN_NOT_SET***")
 INFLUX_ORG        = "Shepherds"
 INFLUX_BUCKET     = "Multiplex_Sensor_Data"
 

@@ -1,22 +1,25 @@
 #!/usr/bin/env python3
 """
-LoRaReceiver_InfluxSender_Updated.py  (v2 - per-node tables + syrup tracking)
-Receives LoRa packets from all three nodes and routes them to separate InfluxDB
-measurements using InfluxDB line protocol field strings directly.
+LoRaReceiver_InfluxSender_Updated.py  (v2 - native field parsing + syrup tracking)
+Receives LoRa packets from all three nodes and writes InfluxDB line protocol
+field strings directly, so Grafana can query individual fields natively.
 
-Routing logic (based on first character of packet):
-  C -> chiller_node_table
-  B -> booster_node_table
-  D -> dispenser_node_table_w_syrupRemaining  (also appends calculated syrup remaining)
-
-Syrup remaining is computed by querying the last known syrup dispensed vs last
-syrupRemaining value from InfluxDB, then appending the delta.
+Routing:
+  C: -> chiller_node_table
+  B: -> booster_node_table
+  D: -> dispenser_node_table_w_syrupRemaining
+         (also appends calculated syrupRemaining by querying last known values)
 
 InfluxDB: InfluxDB Cloud (AWS us-east-1)
 Org: Shepherds | Bucket: Multiplex_Sensor_Data
 
-Note: The API token is embedded. Rotate it if this repo is made public.
+IMPORTANT: Set your InfluxDB token in the environment variable INFLUX_TOKEN
+before running. Do not hardcode credentials in this file.
+
+  export INFLUX_TOKEN="your_token_here"
+  python3 LoRaReceiver_InfluxSender_Updated.py
 """
+import os
 import time
 import spidev
 import lgpio
@@ -37,11 +40,11 @@ PREAMBLE = 8
 
 BW_MAP = {125.0: 0x04, 250.0: 0x05, 500.0: 0x06}
 
-INFLUX_URL    = "https://us-east-1-1.aws.cloud2.influxdata.com/api/v2/write"
+INFLUX_URL       = "https://us-east-1-1.aws.cloud2.influxdata.com/api/v2/write"
 INFLUX_QUERY_URL = "https://us-east-1-1.aws.cloud2.influxdata.com/api/v2/query"
-INFLUX_TOKEN  = "SnMPxzwZ88KTo0nPtix7jdfgwGzVS5_t_fj-BMqj69rScCR0auWH4_C35-fdhT0zQCyr8ao1o2oR7zG-vB3WGA=="
-INFLUX_ORG    = "Shepherds"
-INFLUX_BUCKET = "Multiplex_Sensor_Data"
+INFLUX_TOKEN     = os.environ.get("INFLUX_TOKEN", "***INFLUX_TOKEN_NOT_SET***")
+INFLUX_ORG       = "Shepherds"
+INFLUX_BUCKET    = "Multiplex_Sensor_Data"
 
 class SX1262:
     def __init__(self):
@@ -180,7 +183,7 @@ class SX1262:
                 lines = [l for l in response.text.splitlines() if l.strip()]
                 if lines:
                     data_row = lines[-1].split(',')
-                    syrup_val       = float(data_row[8].replace('i', ''))
+                    syrup_val        = float(data_row[8].replace('i', ''))
                     last_syrup_total = float(data_row[9].replace('i', ''))
                     return last_syrup_total - syrup_val
         except Exception as e:
