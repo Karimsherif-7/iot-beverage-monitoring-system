@@ -1,8 +1,6 @@
 # IoT Beverage Dispensing and Monitoring System
 
 > **University of Louisville — CSE 596 Capstone Project (Spring 2026)**
-> Industry Partner: **Multiplex Beverage**
-> Team: Alexander Lain · Roxana Perez Gonzalez · Karim Abdelfattah · Nathan Coffee · Sanjana Nimmala · Robert Meyer
 
 ---
 
