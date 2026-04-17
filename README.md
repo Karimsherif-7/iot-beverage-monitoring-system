@@ -258,9 +258,9 @@ Target board: **Heltec WiFi LoRa 32 V3**
 - [x] LoRa TX from Chiller Node (RadioLib)
 - [x] Pi 5 bare receiver working (chillerReceiver.py)
 - [x] Pi 5 InfluxDB writer working (LoRaReceiver_InfluxSender_Updated.py)
-- [ ] Grafana dashboard panels configured
-- [ ] Booster Node firmware (ACS723 current sensing)
-- [ ] End-to-end integration test with the hardware
+- [x] Grafana dashboard panels configured
+- [x] Booster Node firmware (ACS723 current sensing)
+- [x] End-to-end integration test with the hardware
 
 ---
 
